@@ -9,16 +9,29 @@
 #
 #*****************************************************************************
 
-# Add your Source files to this variable
-SOURCES =	main.c \
-		memory.c \
-		startup_msp432p401r_gcc.c \
-		system_msp432p401r.c \
-		interrupts_msp432p401r_gcc.c
+# SOURCES and INCLUDES depend upon platform, host or ARM processor
 
-# Add your include paths to this variable
+ifeq	($(PLATFORM),HOST)
+# SOURCES to use if compiling for Ubuntu Host
+SOURCES =	main.c \
+		memory.c 
+		
+# Header files for Ubuntu Host
 INCLUDES =	-I../include/CMSIS \
 	       -I../include/common \
        -I../include/msp432
 
+# simple approach, if not host then MSP432 by default
+else
+# SOURCES and Header files to use if compiling for MSP board
+SOURCES =	main.c \
+		memory.c \
+		startup_msp432p401r_gcc.c \
+		system_msp432p401r.c \
+	interrupts_msp432p401r_gcc.c
 
+INCLUDES =	-I../include/CMSIS \
+		-I../include/common \
+		-I../include/msp432
+
+endif
