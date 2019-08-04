@@ -28,11 +28,29 @@ PLATFORM = HOST
 TARGET = c1m2
 CFLAGS = -Wall -Werror -g -O0 -std=c99
 
+# use for Ubuntu Linux on x86 default as HOST
+ifeq ($(PLATFORM),HOST)
+	CC = gcc
+	CPPFLAGS = -DHOST $(INCLUDES)
+	LDFLAGS = -Wl,-Map=$(TARGET).map
+	SIZE = size
+endif
+
+# use for ARM processor on MSP board
+ifeq ($(PLATFORM),MSP432)
+	CC = arm-none-eabi-gcc
+	CPPFLAGS = -DMSP432 $(INCLUDES)
+	LINKER_FILE = -T msp432p401r.lds
+	CPU = cortex-m4
+	ARCH = armv7e-m
+	SPECS = nosys.specs
+	ARM_FLAGS = -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16
+endif
 # Architectures Specific Flags
-LINKER_FILE = ../msp432p401r.lds 
-CPU = 
-ARCH = 
-SPECS = 
+# LINKER_FILE = ../msp432p401r.lds 
+# CPU = 
+# ARCH = 
+# SPECS = 
 
 # Compiler Flags and Defines
 CC = 

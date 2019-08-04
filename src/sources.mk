@@ -23,6 +23,7 @@ INCLUDES =	-I../include/CMSIS \
 
 # simple approach, if not host then MSP432 by default
 else
+# generates extraneous text 	($(PLATFORM),MSP432)
 # SOURCES and Header files to use if compiling for MSP board
 SOURCES =	main.c \
 		memory.c \
