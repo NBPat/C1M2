@@ -23,8 +23,10 @@
 #------------------------------------------------------------------------------
 include sources.mk
 
-# Platform Overrides
-PLATFORM = 
+# Platform Overrides to provide a default 
+PLATFORM = HOST 
+TARGET = c1m2
+CFLAGS = -Wall -Werror -g -O0 -std=c99
 
 # Architectures Specific Flags
 LINKER_FILE = ../msp432p401r.lds 
@@ -45,13 +47,14 @@ CPPFLAGs =
 
 
 
-%.o:	%.c
-	gcc -DHOST -c $*.c $(INCLUDES)
+# %.o:	%.c
+# 	gcc -DHOST -c $*.c $(INCLUDES)
 
 
 list:
 	@echo	$(shell ls)
-
+	@echo	$(SOURCES)
+	@echo	$(INCLUDES)
 
 # main.o:	main.c
 #	gcc -DHOST -c main.c $(INCLUDES)
