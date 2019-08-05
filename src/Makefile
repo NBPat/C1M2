@@ -66,23 +66,31 @@ PREPROS = $(SOURCES:.c=.i)
 #
 # the -c flag makes the compiler generate an object code file without linking
 %.o : %.c
-	@echo $(SIZE) $(CC) $(CFLAGS) $(PLATFORM) $(TARGET) $(FLAGS)
 	$(CC) -c $< $(CPPFLAGS) $(CFLAGS) -o $@
-#	gcc -c $< $(CPPFLAGS) $(CFLAGS) -o $@
 
 # the -S flag generates assembly code files from sources
 %.asm : %.c
 	$(CC) -S $< $(CPPFLAGS) $(CFLAGS) -o $@
 
+# the -E flag generates a preprocessed file
+%.i : %.c
+	$(CC) -E $< $(CPPFLAGS) -o $@
 
+# flags -E -M generate dependency files
+%.d : %.c
+	$(CC) -E -M $< $(CPPFLAGS) -o $@
 
-# Architectures Specific Flags
-# LINKER_FILE = ../msp432p401r.lds 
-# CPU = 
-# ARCH = 
-# SPECS = 
+# compile-all will generate all of the object files without linking
+.PHONY: compile-all
+compile-all:$(OBJECTS)
 
+.PHONY: build
+build: $(S)
+build: $(TARGET).out
 
+$(TARGET).out: $(OBJECTS)
+	$(CC) $(OBJECTS) $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) -o $@
+	$(SIZE) $@
 
 
 
@@ -102,4 +110,8 @@ clean:
 #	@echo $(INCLUDES)
 	rm -rf *.o
 	rm -rf *.d
+	rm -rf *.i
+	rm -rf *.s
+	rm -rf *.asm
+	rm -rf *.map
 
