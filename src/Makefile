@@ -24,49 +24,69 @@
 include sources.mk
 
 # Platform Overrides to provide a default 
-PLATFORM = HOST 
+PLATFORM = HOST
+
+# values common to both platforms
 TARGET = c1m2
-CFLAGS = -Wall -Werror -g -O0 -std=c99
+FLAGS = -Wall -Werror -g -O0 -std=c99
 
 # use for Ubuntu Linux on x86 default as HOST
 ifeq ($(PLATFORM),HOST)
 	CC = gcc
-	CPPFLAGS = -DHOST $(INCLUDES)
-	LDFLAGS = -Wl,-Map=$(TARGET).map
 	SIZE = size
+	CPPFLAGS = -DHOST $(INCLUDES)
+	CFLAGS = $(FLAGS)
+	LDFLAGS = -Wl,-Map=$(TARGET).map
 endif
+
 
 # use for ARM processor on MSP board
 ifeq ($(PLATFORM),MSP432)
 	CC = arm-none-eabi-gcc
+	SIZE = arm-none-eabi-size
 	CPPFLAGS = -DMSP432 $(INCLUDES)
-	LINKER_FILE = -T msp432p401r.lds
+	LINKERFILE = ../msp432p401r.lds
+	LDFLAGS =  -Wl,-Map=$(TARGET).map -T $(LINKERFILE)
 	CPU = cortex-m4
 	ARCH = armv7e-m
 	SPECS = nosys.specs
 	ARM_FLAGS = -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16
+	CFLAGS = $(FLAGS) $(ARM_FLAGS) -mcpu=$(CPU) -march=$(ARCH) --specs=$(SPECS)
 endif
+
+ 
+
+OBJECTS = $(SOURCES:.c=.o)
+DEPENDS = $(SOURCES:.c=.d)
+ASSEMBS = $(SOURCES:.c=.asm)
+PREPROS = $(SOURCES:.c=.i)
+
+# 
+#
+#
+# the -c flag makes the compiler generate an object code file without linking
+%.o : %.c
+	@echo $(SIZE) $(CC) $(CFLAGS) $(PLATFORM) $(TARGET) $(FLAGS)
+	$(CC) -c $< $(CPPFLAGS) $(CFLAGS) -o $@
+#	gcc -c $< $(CPPFLAGS) $(CFLAGS) -o $@
+
+# the -S flag generates assembly code files from sources
+%.asm : %.c
+	$(CC) -S $< $(CPPFLAGS) $(CFLAGS) -o $@
+
+
+
 # Architectures Specific Flags
 # LINKER_FILE = ../msp432p401r.lds 
 # CPU = 
 # ARCH = 
 # SPECS = 
 
-# Compiler Flags and Defines
-CC = 
-LD = 
-LDFLAGS = 
-CFLAGS = 
-CPPFLAGs = 
-
-
-# 
-# all:	
 
 
 
-# %.o:	%.c
-# 	gcc -DHOST -c $*.c $(INCLUDES)
+
+
 
 
 list:
@@ -74,8 +94,6 @@ list:
 	@echo	$(SOURCES)
 	@echo	$(INCLUDES)
 
-# main.o:	main.c
-#	gcc -DHOST -c main.c $(INCLUDES)
 
 
 clean:
